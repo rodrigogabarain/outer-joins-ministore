@@ -6,7 +6,7 @@
 
 -- ── CONSULTA 1: LEFT JOIN ─────────────────
 -- Pregunta de negocio: ¿Qué productos del catálogo nunca fueron vendidos?
--- Mostramos los productos que no registran ninguna venta asignada (venta_id es NULL).
+-- Mostramos los productos que no registran ninguna venta asociada (v.venta_id es NULL).
 
 SELECT 
     p.producto_id,
@@ -39,6 +39,7 @@ WHERE p.producto_id IS NULL;
 -- Pregunta de negocio: Vista completa de auditoría que muestre todos los productos y todas las ventas
 -- sin perder ninguna fila, identificando productos sin ventas y ventas sin producto.
 
+-- Estándar SQL (Funciona en PostgreSQL, SQL Server, Oracle, etc.):
 SELECT 
     p.producto_id AS id_producto_catalogo,
     p.nombre,
@@ -50,3 +51,17 @@ SELECT
 FROM productos p
 FULL OUTER JOIN ventas v ON p.producto_id = v.producto_id
 ORDER BY p.producto_id, v.venta_id;
+
+
+-- ── VARIANTE ALTERNATIVA PARA MYSQL ────────
+-- Dado que MySQL no soporta nativamente la sintaxis FULL OUTER JOIN,
+-- se simula combinando un LEFT JOIN con un RIGHT JOIN mediante UNION:
+/*
+SELECT p.producto_id AS id_producto_catalogo, p.nombre, p.categoria, v.venta_id, v.producto_id AS id_producto_venta, v.cantidad, v.fecha_venta
+FROM productos p
+LEFT JOIN ventas v ON p.producto_id = v.producto_id
+UNION
+SELECT p.producto_id AS id_producto_catalogo, p.nombre, p.categoria, v.venta_id, v.producto_id AS id_producto_venta, v.cantidad, v.fecha_venta
+FROM productos p
+RIGHT JOIN ventas v ON p.producto_id = v.producto_id;
+*/
